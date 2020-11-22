@@ -30,7 +30,9 @@ A fast way to install ELK stack is via docker
     "minimum_index_compatibility_version" : "6.0.0-beta1"
   },
   "tagline" : "You Know, for Search"
-}```
+}
+```
+
 
 
 
