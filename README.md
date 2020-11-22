@@ -14,7 +14,7 @@ A fast way to install ELK stack is via docker
 
 - curl -XGET localhost:9200 -u elastic:changeme
 - you should receive a response like this:
-``` {
+```{
   "name" : "128434afe7df",
   "cluster_name" : "docker-cluster",
   "cluster_uuid" : "Udr478jaSO-Ygb1fJVBlfg",
@@ -30,7 +30,7 @@ A fast way to install ELK stack is via docker
     "minimum_index_compatibility_version" : "6.0.0-beta1"
   },
   "tagline" : "You Know, for Search"
-} ```
+}```
 
 
 
