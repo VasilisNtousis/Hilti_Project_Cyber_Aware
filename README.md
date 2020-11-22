@@ -14,7 +14,8 @@ A fast way to install ELK stack is via docker
 
 - curl -XGET localhost:9200 -u elastic:changeme
 - you should receive a response like this:
-```{
+```
+{
   "name" : "128434afe7df",
   "cluster_name" : "docker-cluster",
   "cluster_uuid" : "Udr478jaSO-Ygb1fJVBlfg",
@@ -32,6 +33,12 @@ A fast way to install ELK stack is via docker
   "tagline" : "You Know, for Search"
 }
 ```
+- git clone repo
+- pip3 install -r requirements.txt
+- python3 create_es_df_to_csv.csv *you should copy the  IT Security Awareness Global report.xlsx to repo directory*
+- python3 main.py
+
+
 
 
 
