@@ -7,10 +7,11 @@ from elasticsearch.helpers import streaming_bulk
 
 
 
-def create_index(client):
+
+def create_index_it_awareness(client):
     '''Creates an index in Elasticsearch if onse isn't already there.'''
     client.indices.create(
-        index = 'hilti',
+        index = 'Awareness',
         body = {
             "settings" :{"number_of_shards":1,
                         "index.mapping.ignore_malformed": 'true'},
@@ -18,28 +19,28 @@ def create_index(client):
                 "properties" : { 
                     "index": {"type":"integer"},
                     "Content ID" : {"type": "integer"},
-                    "User ID": {"type" :"integer"},
+                    "User ID": {"type" :"integer","fields":{"keyword":{"type":"keyword"}}},
                     "Email":{"type": "text"},
                     "Last login":{"type":"date"},
                     "Last activity":{"type":"date","ignore_malformed": 'true'},
                     "Registration date": {"type":"date","ignore_malformed": 'true'},
                     "EmployeeGuid": {"type":"text"},
                     "SAPCentralPersonNumber":{"type":"integer"},
-                    "HierarchyDescription" : {"type" : "text"},
-                    "CountryISOCode" : {"type":"text"},
+                    "HierarchyDescription" : {"type" : "text","fields":{"keyword":{"type":"keyword"}}},
+                    "CountryISOCode" : {"type":"text","fields":{"keyword":{"type":"keyword"}}},
                     "CostCenterNumber":{"type":"integer"},
                     "LanguageKey": { "type": "text"},
-                    "CompanyName": { "type": "text"},
+                    "CompanyName": { "type": "text","fields":{"keyword":{"type":"keyword"}}},
                     "Created":{"type": "date","ignore_malformed": 'true'},
-                    "NewHire":{"type":"text"},
+                    "NewHire":{"type":"text","fields":{"keyword":{"type":"keyword"}}},
                     "Company":{"type":"text"},
-                    "Department":{"type":"text"},
-                    "Position":{"type":"text"},
+                    "Department":{"type":"text","fields":{"keyword":{"type":"keyword"}}},
+                    "Position":{"type":"text","fields":{"keyword":{"type":"keyword"}}},
                     "Country":{"type":"text"},
                     "Date course started": {"type":"date", "ignore_malformed": 'true'},
                     "SCORM course status":{"type":"text"},
                     "Test score":{"type":"integer"},
-                    "Session time": {"type": 'text'},
+                    "Session time": {"type": 'text',"fields":{"keyword":{"type":"keyword"}}},
                     "Date course completed": {"type":"date", "ignore_malformed": 'true'},     
                     
                 }
@@ -48,9 +49,45 @@ def create_index(client):
         ignore=400,
     )
 
+def create_index_phising(client):
+    ''' Creates an index on Elastic search for the phising programm'''
+    client.indices.create(
+        index = 'Phising',
+        body = {
+            'settings': {"number_of_shards":1,
+                        "index.mapping.ignore_malformed": 'true'},
+            'mappings' : {
+                'properties': {
+                    'index': {'type':'integer'},
+                    'Subject' : {'type': 'text','fields' : {"keyword":{'type':'keyword'}}},
+                    'Received': {'type':'date', 'ignore_malformed': 'true'},
+                    'Sender':{'type':'text','fields':{'keyword':{'type':'keyword'}}},
+                    'Filename':{'type':'text','fileds':{'keyword':{'type':'keyword'}}}	,
 
-def generate_action():
+                }
 
+            }
+        },
+        ignore=400,
+    )
+
+
+def generate_action_phising():
+    with open('dataPhising.csv') as g:
+        reader = csv.DictReader(g)
+        for row in reader:
+            doc = {
+                
+                'Subject' : row['Subject'] ,
+                'Received' : row['Received'],
+                'Sender': row['Sender'],
+                'Filename' :row['Filename']
+
+            }
+            yield doc
+        
+
+def generate_action_awareness():
     with open('hilti.csv',mode='r') as f:
         reader = csv.DictReader(f)
 
@@ -83,27 +120,47 @@ def generate_action():
             }
             yield doc
 
-def main():
-    print("Loading dataset")
-    number_of_rows = 32313
 
+
+def upload_awareness():
+    print("Loading awareness dataset")
+    number_of_rows = 32313
 
     client = Elasticsearch(
         http_auth = ('elastic','changeme')      
     )
     print('Creating an index')
-    create_index(client)
+    create_index_it_awareness(client)
     print("Indexing documents")
     progress = tqdm.tqdm(unit='docs',total=number_of_rows)
     successes = 0 
     for ok , action in streaming_bulk(
-        client=client,index='hilti',actions=generate_action(),
+        client=client,index='Awareness',actions=generate_action_awareness(),
     ):
         progress.update(1)
         successes+=ok
     print("Indexed %d/%d documents" % (successes, number_of_rows))
 
 
+def upload_phising():
+    print("Loading phising dataset")
+    number_of_rows = 1050
+    client = Elasticsearch(
+        http_auth = ('elastic','changeme')      
+    )
+    print('Creating an index')
+    create_index_it_awareness(client)
+    print("Indexing documents")
+    progress = tqdm.tqdm(unit='docs',total=number_of_rows)
+    successes = 0 
+    for ok , action in streaming_bulk(
+        client=client,index='phising',actions=generate_action_phising(),
+    ):
+        progress.update(1)
+        successes+=ok
+    print("Indexed %d/%d documents" % (successes, number_of_rows))
+
 
 if __name__ == "__main__":
-    main()
+    #upload_awareness()
+    upload_phising()
