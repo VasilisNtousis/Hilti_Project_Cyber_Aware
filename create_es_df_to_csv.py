@@ -1,6 +1,6 @@
 import pandas as pd 
 
-def awarenessdataset():
+def awareness_dataset():
     sec_df = pd.read_excel('IT Security Awareness Global report.xlsx')
 
     sec_df  = sec_df.drop(columns=['Username','FunctionalAreaName','CostCenterName',

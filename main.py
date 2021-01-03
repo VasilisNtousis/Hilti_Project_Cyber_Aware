@@ -11,7 +11,7 @@ from elasticsearch.helpers import streaming_bulk
 def create_index_it_awareness(client):
     '''Creates an index in Elasticsearch if onse isn't already there.'''
     client.indices.create(
-        index = 'Awareness',
+        index = 'hilti_awareness',
         body = {
             "settings" :{"number_of_shards":1,
                         "index.mapping.ignore_malformed": 'true'},
@@ -52,7 +52,7 @@ def create_index_it_awareness(client):
 def create_index_phising(client):
     ''' Creates an index on Elastic search for the phising programm'''
     client.indices.create(
-        index = 'Phising',
+        index = 'hilti_phising',
         body = {
             'settings': {"number_of_shards":1,
                         "index.mapping.ignore_malformed": 'true'},
@@ -135,7 +135,7 @@ def upload_awareness():
     progress = tqdm.tqdm(unit='docs',total=number_of_rows)
     successes = 0 
     for ok , action in streaming_bulk(
-        client=client,index='Awareness',actions=generate_action_awareness(),
+        client=client,index='hilti_awareness',actions=generate_action_awareness(),
     ):
         progress.update(1)
         successes+=ok
@@ -154,7 +154,7 @@ def upload_phising():
     progress = tqdm.tqdm(unit='docs',total=number_of_rows)
     successes = 0 
     for ok , action in streaming_bulk(
-        client=client,index='phising',actions=generate_action_phising(),
+        client=client,index='hilti_phising',actions=generate_action_phising(),
     ):
         progress.update(1)
         successes+=ok
@@ -162,5 +162,5 @@ def upload_phising():
 
 
 if __name__ == "__main__":
-    #upload_awareness()
+    upload_awareness()
     upload_phising()
